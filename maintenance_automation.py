@@ -205,3 +205,46 @@ def option_Synthetic_Tests():
 		}
 	]
 	return blocks
+
+def option_Get_by_status():
+	blocks = [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Pick a Get by status option from the list"
+			},
+			"accessory": {
+				"type": "static_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select"
+				},
+				"options":[
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Live"
+						},
+						"value": "0"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Paused"
+						},
+						"value": "1"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Back to Main Menu"
+						},
+						"value": "2"
+					}
+				],
+				"action_id": "static_select-action"
+			}
+		}
+	]
+	return blocks

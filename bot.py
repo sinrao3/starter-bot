@@ -52,11 +52,9 @@ def start():
 
 @ app.route('/result', methods=['POST'])
 def result():
-    print("hello")
     global selected_menu
     data = request.form
     payload = data.get('payload')
-    #print(payload)
     payload_dict = json.loads(payload)
     channel_id = payload_dict.get('container').get('channel_id')
     selected_option = payload_dict.get('actions')[0].get('selected_option').get('text').get('text')
