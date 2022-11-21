@@ -206,6 +206,70 @@ def option_Synthetic_Tests():
 	]
 	return blocks
 
+def option_Downtime():
+	blocks= [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Pick a Downtime option list"
+			},
+			"accessory": {
+				"type": "static_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select an item"
+				},
+				"options": [
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Get all"
+						},
+						"value": "0"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Get by status"
+						},
+						"value": "1"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Schedule"
+						},
+						"value": "2"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Cancell"
+						},
+						"value": "3"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Back to main menu"
+						},
+						"value": "4"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Quit"
+						},
+						"value": "5"
+					}
+				],
+				"action_id": "static_select-action"
+			}
+		}
+	]
+	return blocks
+
 def option_Get_by_status():
 	blocks = [
 		{
