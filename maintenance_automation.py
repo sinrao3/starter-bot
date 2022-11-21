@@ -206,13 +206,13 @@ def option_Synthetic_Tests():
 	]
 	return blocks
 
-def option_Downtime():
+def option_Downtimes():
 	blocks= [
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Pick a Downtime option list"
+				"text": "Pick a Downtimes option list"
 			},
 			"accessory": {
 				"type": "static_select",
