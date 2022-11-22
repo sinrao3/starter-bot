@@ -134,7 +134,7 @@ def option_Synthetic_Tests():
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Pick a Synthetic Tests option list"
+				"text": "Pick a Synthetic Tests option from the list"
 			},
 			"accessory": {
 				"type": "static_select",
@@ -212,7 +212,7 @@ def option_Downtimes():
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Pick a Downtimes option list"
+				"text": "Pick a Downtimes option from the list"
 			},
 			"accessory": {
 				"type": "static_select",
@@ -245,7 +245,7 @@ def option_Downtimes():
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Cancell"
+							"text": "Cancel"
 						},
 						"value": "3"
 					},
@@ -305,6 +305,63 @@ def option_Get_by_status():
 							"text": "Back to Main Menu"
 						},
 						"value": "2"
+					}
+				],
+				"action_id": "static_select-action"
+			}
+		}
+	]
+	return blocks
+
+def option_Zabbix():
+	blocks= [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Pick a Zabbix option from the list"
+			},
+			"accessory": {
+				"type": "static_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select an item"
+				},
+				"options": [
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "View Scheduled Maintenances"
+						},
+						"value": "0"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Schedule Downtime"
+						},
+						"value": "1"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Delete Maintenance"
+						},
+						"value": "2"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Back to main menu"
+						},
+						"value": "3"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Quit"
+						},
+						"value": "4"
 					}
 				],
 				"action_id": "static_select-action"
