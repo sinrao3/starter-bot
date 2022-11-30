@@ -6,9 +6,14 @@ from dotenv import load_dotenv
 from flask import Flask, request, Response
 from slackeventsapi import SlackEventAdapter
 import maintenance_automation
+import maintenance_utility
 import json
+from datadog_api_client.v1 import Configuration
 
 selected_menu="maintenance/automation"
+env_file = os.path.dirname(os.path.realpath(__file__)) + os.sep + "config/env.file"
+load_dotenv(env_file)
+config= Configuration()
 
 env_path=Path('.') / '.env'
 load_dotenv(dotenv_path=env_path)
@@ -50,10 +55,13 @@ def result():
     selected_menu=selected_option
     selected_option=selected_option.replace(' ', '_')
     client.chat_update(token=token,channel = channel_id,ts=ts, blocks=blocks)
-    blocks1=getattr(maintenance_automation, 'option_%s' % selected_option)()
-    client.chat_postMessage(channel = channel_id, blocks=blocks1)
+    if selected_option in maintenance_utility.my_list:
+        getattr(maintenance_utility,'maintenance_utility_%s' % selected_option)(config) 
+    else:
+        blocks1=getattr(maintenance_automation, 'option_%s' % selected_option)()
+        client.chat_postMessage(channel = channel_id, blocks=blocks1)
     return Response(), 200
 
-
+    
 if __name__ == "__main__":
     app.run(debug=True,port=5001)

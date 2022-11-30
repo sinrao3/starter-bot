@@ -77,6 +77,11 @@ def selected_from_menu(selected_option,selected_menu):
 	]
 	return blocks
 
+def option_Back_to_Main_Menu():
+	return main_menu()
+   
+
+
 def option_DataDog():
 	blocks = [
 		
@@ -362,6 +367,92 @@ def option_Zabbix():
 							"text": "Quit"
 						},
 						"value": "4"
+					}
+				],
+				"action_id": "static_select-action"
+			}
+		}
+	]
+	return blocks
+
+def option_View_Scheduled_Maintenances():
+	blocks = [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Pick a View Scheduled Maintenance option from the list"
+			},
+			"accessory": {
+				"type": "static_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select"
+				},
+				"options":[
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Hongkong"
+						},
+						"value": "0"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Thailand"
+						},
+						"value": "1"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Quit"
+						},
+						"value": "2"
+					}
+				],
+				"action_id": "static_select-action"
+			}
+		}
+	]
+	return blocks
+
+def option_Schedule_Downtime():
+	blocks = [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Pick a View Scheduled Maintenance option from the list"
+			},
+			"accessory": {
+				"type": "static_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select"
+				},
+				"options":[
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Hongkong"
+						},
+						"value": "0"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Thailand"
+						},
+						"value": "1"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Quit"
+						},
+						"value": "2"
 					}
 				],
 				"action_id": "static_select-action"
