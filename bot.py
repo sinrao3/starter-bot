@@ -45,21 +45,33 @@ def result():
     global selected_menu
     data = request.form
     payload = data.get('payload')
+    print(payload)
     payload_dict = json.loads(payload)
     channel_id = payload_dict.get('container').get('channel_id')
-    selected_option = payload_dict.get('actions')[0].get('selected_option').get('text').get('text')
-    selected_value=payload_dict.get('actions')[0].get('selected_option').get('value')
     token=os.environ['SLACK_TOKEN']
     ts=payload_dict.get('container').get('message_ts')
-    blocks=maintenance_automation.selected_from_menu(selected_option,selected_menu)
-    selected_menu=selected_option
-    selected_option=selected_option.replace(' ', '_')
-    client.chat_update(token=token,channel = channel_id,ts=ts, blocks=blocks)
-    if selected_option in maintenance_utility.my_list:
-        getattr(maintenance_utility,'maintenance_utility_%s' % selected_option)(config) 
+    if(payload_dict.get('actions')[0].get('type')== 'multi_static_select'):
+        selected_options=payload_dict.get('actions')[0].get('selected_options')
+        options=[]
+        for option in selected_options:
+            options.append(option.get('text').get('text'))
+        if(payload_dict.get('message').get('blocks')[0].get('accessory').get('placeholder').get('text')=='Pause IDs'):
+            blocks=maintenance_utility.do_Pause_by_ID(config,options)
+        else:
+            blocks=maintenance_utility.do_Unpause_by_ID(config,options)
+        client.chat_postMessage(channel = channel_id, blocks=blocks)
     else:
-        blocks1=getattr(maintenance_automation, 'option_%s' % selected_option)()
-        client.chat_postMessage(channel = channel_id, blocks=blocks1)
+        selected_option = payload_dict.get('actions')[0].get('selected_option').get('text').get('text')
+        blocks=maintenance_automation.selected_from_menu(selected_option,selected_menu)
+        selected_menu=selected_option
+        selected_option=selected_option.replace(' ', '_')
+        client.chat_update(token=token,channel = channel_id,ts=ts, blocks=blocks)
+        if selected_option in maintenance_utility.my_list:
+            blocks1=getattr(maintenance_utility,'maintenance_utility_%s' % selected_option)(config) 
+            client.chat_postMessage(channel = channel_id, blocks=blocks1)   
+        else:
+            blocks2=getattr(maintenance_automation, 'option_%s' % selected_option)()
+            client.chat_postMessage(channel = channel_id, blocks=blocks2)
     return Response(), 200
 
     

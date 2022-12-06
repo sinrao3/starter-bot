@@ -172,7 +172,7 @@ def option_Synthetic_Tests():
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Un-pause all"
+							"text": "Unpause all"
 						},
 						"value": "3"
 					},
@@ -186,7 +186,7 @@ def option_Synthetic_Tests():
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Un-pause by ID"
+							"text": "Unpause by ID"
 						},
 						"value": "5"
 					},
@@ -293,14 +293,14 @@ def option_Get_by_status():
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Live"
+							"text": "Get by status Live"
 						},
 						"value": "0"
 					},
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Paused"
+							"text": "Get by status Paused"
 						},
 						"value": "1"
 					},
