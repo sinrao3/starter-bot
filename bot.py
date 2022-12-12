@@ -45,7 +45,6 @@ def result():
     global selected_menu
     data = request.form
     payload = data.get('payload')
-    print(payload)
     payload_dict = json.loads(payload)
     channel_id = payload_dict.get('container').get('channel_id')
     token=os.environ['SLACK_TOKEN']
@@ -60,6 +59,10 @@ def result():
         else:
             blocks=maintenance_utility.do_Unpause_by_ID(config,options)
         client.chat_postMessage(channel = channel_id, blocks=blocks)
+    elif(payload_dict.get('actions')[0].get('type')== 'plain_text_input'):
+        selected_value=payload_dict.get('actions')[0].get('value')
+        blocks3=maintenance_utility.maintenance_utility_Schedule_datadog_downtime(config,selected_value)
+        client.chat_update(token=token,channel = channel_id,ts=ts, blocks=blocks3)
     else:
         selected_option = payload_dict.get('actions')[0].get('selected_option').get('text').get('text')
         blocks=maintenance_automation.selected_from_menu(selected_option,selected_menu)

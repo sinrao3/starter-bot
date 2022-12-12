@@ -80,8 +80,19 @@ def selected_from_menu(selected_option,selected_menu):
 def option_Back_to_Main_Menu():
 	return main_menu()
    
+def option_Quit():
+	blocks= [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*You have stopped the maintenance bot*"
+			}
+		}
+	]
+	return blocks
 
-
+#Datadog
 def option_DataDog():
 	blocks = [
 		
@@ -101,14 +112,14 @@ def option_DataDog():
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Synthetic Tests"
+							"text": "Synthetic tests"
 						},
 						"value": "0"
 					},
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Downtimes"
+							"text": "Datadog downtimes"
 						},
 						"value": "1"
 					},
@@ -133,13 +144,13 @@ def option_DataDog():
 	]
 	return blocks
 
-def option_Synthetic_Tests():
+def option_Synthetic_tests():
 	blocks= [
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Pick a Synthetic Tests option from the list"
+				"text": "Pick a Synthetic tests option from the list"
 			},
 			"accessory": {
 				"type": "static_select",
@@ -193,7 +204,7 @@ def option_Synthetic_Tests():
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Back to main menu"
+							"text": "Back to Main Menu"
 						},
 						"value": "6"
 					},
@@ -203,70 +214,6 @@ def option_Synthetic_Tests():
 							"text": "Quit"
 						},
 						"value": "7"
-					}
-				],
-				"action_id": "static_select-action"
-			}
-		}
-	]
-	return blocks
-
-def option_Downtimes():
-	blocks= [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Pick a Downtimes option from the list"
-			},
-			"accessory": {
-				"type": "static_select",
-				"placeholder": {
-					"type": "plain_text",
-					"text": "Select an item"
-				},
-				"options": [
-					{
-						"text": {
-							"type": "plain_text",
-							"text": "Get all"
-						},
-						"value": "0"
-					},
-					{
-						"text": {
-							"type": "plain_text",
-							"text": "Get by status"
-						},
-						"value": "1"
-					},
-					{
-						"text": {
-							"type": "plain_text",
-							"text": "Schedule"
-						},
-						"value": "2"
-					},
-					{
-						"text": {
-							"type": "plain_text",
-							"text": "Cancel"
-						},
-						"value": "3"
-					},
-					{
-						"text": {
-							"type": "plain_text",
-							"text": "Back to main menu"
-						},
-						"value": "4"
-					},
-					{
-						"text": {
-							"type": "plain_text",
-							"text": "Quit"
-						},
-						"value": "5"
 					}
 				],
 				"action_id": "static_select-action"
@@ -318,6 +265,245 @@ def option_Get_by_status():
 	]
 	return blocks
 
+def option_Datadog_downtimes():
+	blocks= [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Pick a Downtimes option from the list"
+			},
+			"accessory": {
+				"type": "static_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select an item"
+				},
+				"options": [
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Get all datadog downtimes"
+						},
+						"value": "0"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Get datadog downtimes by status"
+						},
+						"value": "1"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Schedule datadog downtime"
+						},
+						"value": "2"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Back to Main Menu"
+						},
+						"value": "3"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Quit"
+						},
+						"value": "4"
+					}
+				],
+				"action_id": "static_select-action"
+			}
+		}
+	]
+	return blocks
+
+def option_Get_datadog_downtimes_by_status():
+	blocks = [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Pick a Get datdog downtimes by status option from the list"
+			},
+			"accessory": {
+				"type": "static_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select"
+				},
+				"options":[
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Get datadog downtimes by status Live"
+						},
+						"value": "0"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Get datadog downtimes by status Scheduled"
+						},
+						"value": "1"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Back to Main Menu"
+						},
+						"value": "2"
+					}
+				],
+				"action_id": "static_select-action"
+			}
+		}
+	]
+	return blocks
+
+def option_Schedule_datadog_downtime():
+	blocks= [
+		{
+			"type": "input",
+			"dispatch_action": True,
+			"element": {
+				"type": "plain_text_input",
+				"action_id": "plain_text_input-action",
+				"dispatch_action_config": {
+      				"trigger_actions_on": ["on_enter_pressed"]
+    			}
+			},
+			"label": {
+				"type": "plain_text",
+				"text": "Enter start and end date and time (YYYY-MM-DDTHH:MM:SS,YYYY-MM-DDTHH:MM:SS)"
+			}
+		}
+	]
+	return blocks
+
+#Wormly
+def option_Wormly():
+	blocks= [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Pick a Wormly option from the list"
+			},
+			"accessory": {
+				"type": "static_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select an item"
+				},
+				"options": [
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Get all wormly downtimes"
+						},
+						"value": "0"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Get wormly downtimes by hostID"
+						},
+						"value": "1"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Schedule all wormly downtimes"
+						},
+						"value": "2"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Schedule wormly downtime for HostID"
+						},
+						"value": "3"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Back to Main Menu"
+						},
+						"value": "4"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Quit"
+						},
+						"value": "5"
+					}
+				],
+				"action_id": "static_select-action"
+			}
+		}
+	]
+	return blocks
+
+def option_Get_all_wormly_downtimes():
+	blocks= [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "Pick a Get all wormly downtimes option from the list"
+			},
+			"accessory": {
+				"type": "static_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select an item"
+				},
+				"options": [
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "MyJS"
+						},
+						"value": "0"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "CFS"
+						},
+						"value": "1"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Both"
+						},
+						"value": "2"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Back to Main Menu"
+						},
+						"value": "3"
+					}
+				],
+				"action_id": "static_select-action"
+			}
+		}
+	]
+	return blocks
+	
+# def Get_wormly_downtimes_by_hostID():
+# def Schedule_all_wormly_downtimes():
+# def Schedule_wormly_downtime_for_hostID():
+#Zabbix
 def option_Zabbix():
 	blocks= [
 		{
@@ -336,28 +522,28 @@ def option_Zabbix():
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "View Scheduled Maintenances"
+							"text": "View scheduled maintenances"
 						},
 						"value": "0"
 					},
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Schedule Downtime"
+							"text": "Schedule zabbix downtime"
 						},
 						"value": "1"
 					},
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Delete Maintenance"
+							"text": "Delete maintenance"
 						},
 						"value": "2"
 					},
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Back to main menu"
+							"text": "Back to Main Menu"
 						},
 						"value": "3"
 					},
@@ -375,13 +561,13 @@ def option_Zabbix():
 	]
 	return blocks
 
-def option_View_Scheduled_Maintenances():
+def option_View_scheduled_maintenances():
 	blocks = [
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Pick a View Scheduled Maintenance option from the list"
+				"text": "Pick a View scheduled maintenance option from the list"
 			},
 			"accessory": {
 				"type": "static_select",
@@ -393,14 +579,14 @@ def option_View_Scheduled_Maintenances():
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Hongkong"
+							"text": "View scheduled maintenance for hongkong"
 						},
 						"value": "0"
 					},
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Thailand"
+							"text": "View scheduled maintenance for thailand"
 						},
 						"value": "1"
 					},
@@ -418,13 +604,13 @@ def option_View_Scheduled_Maintenances():
 	]
 	return blocks
 
-def option_Schedule_Downtime():
+def option_Schedule_zabbix_downtime():
 	blocks = [
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Pick a View Scheduled Maintenance option from the list"
+				"text": "Pick a Schedule downtime option from the list"
 			},
 			"accessory": {
 				"type": "static_select",
@@ -436,14 +622,14 @@ def option_Schedule_Downtime():
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Hongkong"
+							"text": "Schedule downtime for hongkong"
 						},
 						"value": "0"
 					},
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Thailand"
+							"text": "Schedule downtime for thailand"
 						},
 						"value": "1"
 					},
@@ -460,3 +646,4 @@ def option_Schedule_Downtime():
 		}
 	]
 	return blocks
+
