@@ -105,22 +105,22 @@ def get_wormly_downtimes(hostids, noprint):
 
 
 def set_wormly_downtimes(hostids, start, end, timezone, recurrence, on):
-    """Set downtimes in Wormly for the HostID(s)."""
-    for host in hostids:
-        url = "https://api.wormly.com/?key=" + os.getenv('key') + "&cmd=setScheduledDowntimePeriod&response=json&hostid=" + host + "&start=" + start + "&end=" + end + "&timezone=" + timezone + "&recurrence=" + recurrence + "&on=" + on
-
-        payload = {}
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-        }
-        # print(url)
-
-        response = requests.get(url, headers=headers, data=payload)
-        data = json.loads(response.text)
-        # pprint(data)
-        if data["errorcode"] == 0:
-            print(f"Downtime scheduled successfully for HostID: {host}")
+    downtimes=""
+    # for host in hostids:
+    #     url = "https://api.wormly.com/?key=" + os.getenv('key') + "&cmd=setScheduledDowntimePeriod&response=json&hostid=" + host + "&start=" + start + "&end=" + end + "&timezone=" + timezone + "&recurrence=" + recurrence + "&on=" + on
+    #     payload = {}
+    #     headers = {
+    #         'Content-Type': 'application/json',
+    #         'Accept': 'application/json',
+    #     }
+    #     response = requests.get(url, headers=headers, data=payload)
+    #     data = json.loads(response.text)
+    #     if data["errorcode"] == 0:
+    #         downtimes+=(f"Downtime scheduled successfully for HostID: {host}"+"\n")
+    #     else:
+    #         downtimes+=(f"Error in scheduling downtime for HostID: {host}"+"\n")
+    views=maintenance_utility.create_modal("Wormly downtimes","downtimes")
+    return views
 
 
 def list_synthetic_tests(config, scope, noprint):

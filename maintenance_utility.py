@@ -1,7 +1,7 @@
 import mtools
 import datetime
 my_list =["Get_all","Get_by_status_Live","Get_by_status_Paused","Pause_all","Unpause_all","Pause_by_ID","Unpause_by_ID","Get_all_datadog_downtimes",
-"Get_datadog_downtimes_by_status_Live","Get_datadog_downtimes_by_status_Scheduled","MyJS","CFS","Both"] 
+"Get_datadog_downtimes_by_status_Live","Get_datadog_downtimes_by_status_Scheduled","MyJS","CFS","Both","Get_wormly_downtimes_by_hostID","Schedule_wormly_downtime_for_hostID"] 
 
 #***********Synthetic tests start***********
 def maintenance_utility_Get_all(config):
@@ -98,6 +98,64 @@ def maintenance_utility_Both(config):
 	blocks=mtools.get_wormly_downtimes(mtools.myjs_hostids+mtools.cfs_hostids, False)
 	return blocks
 
+def maintenance_utility_Get_wormly_downtimes_by_hostID(config):
+	options=[]
+	j=0
+	for i in mtools.myjs_hostids:
+		option={
+					"text": {
+						"type": "plain_text",
+						"text": i,
+						"emoji": True
+					},
+					"value": "value-"+str(j)
+				}
+		options.append(option)
+		j+=1
+	for i in mtools.cfs_hostids:
+		option={
+					"text": {
+						"type": "plain_text",
+						"text": i,
+						"emoji": True
+					},
+					"value": "value-"+str(j)
+				}
+		options.append(option)
+		j+=1
+	blocks=create_static_select(options,"Select a wormly host ID")
+	return blocks
+
+def get_wormly_downtimes_by_hostID(selected_hostID):
+	blocks=mtools.get_wormly_downtimes([selected_hostID], False)
+	return blocks
+	
+def get_default_wormly_downtimes(selected_hostID=mtools.myjs_hostids[0]):
+	print(selected_hostID)
+	result=mtools.get_wormly_downtimes([selected_hostID], True)
+	results=[]
+	results.append(result[0][selected_hostID]['on'])
+	results.append(result[0][selected_hostID]['start'])
+	results.append(result[0][selected_hostID]['end'])
+	results.append(result[0][selected_hostID]['timezone'])
+	return results
+
+def maintenance_utility_Schedule_all_wormly_downtime(selected_values):
+	if(selected_values[4]=="MyJS"):
+		views=mtools.set_wormly_downtimes(mtools.myjs_hostids, selected_values[1], selected_values[2], selected_values[3], "ONCEONLY",selected_values[0])
+	elif(selected_values[4]=="CFS"):
+		views=mtools.set_wormly_downtimes(mtools.cfs_hostids, selected_values[1], selected_values[2], selected_values[3], "ONCEONLY",selected_values[0])
+	elif(selected_values[4]=="Both"):
+		views=mtools.set_wormly_downtimes(mtools.myjs_hostids+mtools.cfs_hostids, selected_values[1], selected_values[2], selected_values[3], "ONCEONLY",selected_values[0])
+	else:
+		views=mtools.set_wormly_downtimes([selected_values[4]], selected_values[1], selected_values[2], selected_values[3], "ONCEONLY",selected_values[0])
+	return views
+
+def maintenance_utility_Schedule_wormly_downtime_for_hostID(config):
+	options=create_options_for_multiple_select(mtools.myjs_hostids+mtools.cfs_hostids)
+	blocks=create_static_select(options,"Select a wormly hostID")
+	return blocks
+
 #***********Wormly end***********
 def create_block(data):
 	blocks= [
@@ -114,13 +172,44 @@ def create_block(data):
 	]
 	return blocks    
 
+def create_modal(title,data):
+	views= {
+		"type": "modal",
+		"title": {
+			"type": "plain_text",
+			"text": title,
+			"emoji": True
+		},
+		"submit": {
+			"type": "plain_text",
+			"text": "Done",
+			"emoji": True
+		},
+		"close": {
+			"type": "plain_text",
+			"text": "Cancel",
+			"emoji": True
+		},
+		"blocks": [
+			{
+				"type": "section",
+				"text": {
+					"type": "plain_text",
+					"text": data,
+					"emoji": True
+				}
+			}
+		]
+	}
+	return views
+
 def create_multiple_select(options,text):
 	blocks= [
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Select Test IDs "
+				"text": "Select an option "
 			},
 			"accessory":{
 				"type": "multi_static_select",
@@ -131,6 +220,28 @@ def create_multiple_select(options,text):
 				},
 				"options":options,
 				"action_id": "multi_static_select-action"
+			}
+		}
+	]
+	return blocks
+
+def create_static_select(options,text):
+	blocks= [
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": text
+			},
+			"accessory": {
+				"type": "static_select",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "Select an item",
+					"emoji": True
+				},
+				"options": options,
+				"action_id": "static_select-action"
 			}
 		}
 	]

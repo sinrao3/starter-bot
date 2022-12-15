@@ -1,3 +1,5 @@
+my_modal_list=["Schedule_all_wormly_downtimes"]
+
 def main_menu():
 	blocks = [
 		{
@@ -425,7 +427,7 @@ def option_Wormly():
 					{
 						"text": {
 							"type": "plain_text",
-							"text": "Schedule wormly downtime for HostID"
+							"text": "Schedule wormly downtime for hostID"
 						},
 						"value": "3"
 					},
@@ -500,9 +502,236 @@ def option_Get_all_wormly_downtimes():
 	]
 	return blocks
 	
-# def Get_wormly_downtimes_by_hostID():
-# def Schedule_all_wormly_downtimes():
-# def Schedule_wormly_downtime_for_hostID():
+def option_Schedule_all_wormly_downtimes(results):
+	view= {
+		"type": "modal",
+		"title": {
+			"type": "plain_text",
+			"text": "Wormly downtimes",
+			"emoji": True
+		},
+		"submit": {
+			"type": "plain_text",
+			"text": "Done",
+			"emoji": True
+		},
+		"close": {
+			"type": "plain_text",
+			"text": "Cancel",
+			"emoji": True
+		},
+		"blocks": [
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "plain_text_input-action",
+					"initial_value":results[0]
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "Date for downtime (YYYY-MM-DD)",
+					"emoji": True
+				}
+			},
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "plain_text_input-action",
+					"initial_value":results[1]
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "Start time for downtime(HH:MM)",
+					"emoji": True
+				}
+			},
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "plain_text_input-action",
+					"initial_value":results[2]
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "End time for downtime (HH:MM)",
+					"emoji": True
+				}
+			},
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "plain_text_input-action",
+					"initial_value":results[3]
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "Timezone",
+					"emoji": True
+				}
+			},
+			{
+			"type": "input",
+			"element": {
+				"type": "radio_buttons",
+				"options": [
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "MyJS",
+							"emoji": True
+						},
+						"value": "value-0"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "CFS",
+							"emoji": True
+						},
+						"value": "value-1"
+					},
+					{
+						"text": {
+							"type": "plain_text",
+							"text": "Both",
+							"emoji": True
+						},
+						"value": "value-2"
+					}
+				],
+				"action_id": "radio_buttons-action"
+			},
+			"label": {
+				"type": "plain_text",
+				"text": "Set downtimes for",
+				"emoji": True
+			}
+		},
+		{
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Click the button to schedule downtime"
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Schedule",
+                        "emoji": True
+                    },
+                    "value": "click_me_123",
+                    "action_id": "button-action"
+                }
+            }
+		]
+	}
+	return view
+
+def option_Schedule_wormly_downtime_for_hostID(results,selected_hostID):
+	view= {
+		"type": "modal",
+		"title": {
+			"type": "plain_text",
+			"text": "Wormly downtimes",
+			"emoji": True
+		},
+		"submit": {
+			"type": "plain_text",
+			"text": "Done",
+			"emoji": True
+		},
+		"close": {
+			"type": "plain_text",
+			"text": "Cancel",
+			"emoji": True
+		},
+		"blocks": [
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "plain_text_input-action",
+					"initial_value":results[0]
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "Date for downtime (YYYY-MM-DD)",
+					"emoji": True
+				}
+			},
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "plain_text_input-action",
+					"initial_value":results[1]
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "Start time for downtime(HH:MM)",
+					"emoji": True
+				}
+			},
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "plain_text_input-action",
+					"initial_value":results[2]
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "End time for downtime (HH:MM)",
+					"emoji": True
+				}
+			},
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "plain_text_input-action",
+					"initial_value":results[3]
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "Timezone",
+					"emoji": True
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "plain_text",
+					"text": "The selected wormly hostID is: " + selected_hostID,
+					"emoji": True
+				}
+			},
+			{
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Click the button to schedule downtime"
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Schedule",
+                        "emoji": True
+                    },
+                    "value": "click_me_123",
+                    "action_id": "button-action"
+                }
+            }
+		]
+	}
+	return view
+
 #Zabbix
 def option_Zabbix():
 	blocks= [

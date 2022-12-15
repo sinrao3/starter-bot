@@ -43,38 +43,75 @@ def start():
 @ app.route('/result', methods=['POST'])
 def result():
     global selected_menu
+    token=os.environ['SLACK_TOKEN']
     data = request.form
     payload = data.get('payload')
     payload_dict = json.loads(payload)
-    channel_id = payload_dict.get('container').get('channel_id')
-    token=os.environ['SLACK_TOKEN']
-    ts=payload_dict.get('container').get('message_ts')
-    if(payload_dict.get('actions')[0].get('type')== 'multi_static_select'):
-        selected_options=payload_dict.get('actions')[0].get('selected_options')
-        options=[]
-        for option in selected_options:
-            options.append(option.get('text').get('text'))
-        if(payload_dict.get('message').get('blocks')[0].get('accessory').get('placeholder').get('text')=='Pause IDs'):
-            blocks=maintenance_utility.do_Pause_by_ID(config,options)
-        else:
-            blocks=maintenance_utility.do_Unpause_by_ID(config,options)
-        client.chat_postMessage(channel = channel_id, blocks=blocks)
-    elif(payload_dict.get('actions')[0].get('type')== 'plain_text_input'):
-        selected_value=payload_dict.get('actions')[0].get('value')
-        blocks3=maintenance_utility.maintenance_utility_Schedule_datadog_downtime(config,selected_value)
-        client.chat_update(token=token,channel = channel_id,ts=ts, blocks=blocks3)
+    print(payload_dict)
+    if(payload_dict.get('view') != None and (payload_dict.get('view').get('title').get('text')== "Wormly downtimes")):
+        if(payload_dict.get('type')=="block_actions"):
+            block_ids=[]
+            selected_values = []
+            blocks = payload_dict.get('view').get('blocks')
+            view_id=payload_dict.get('view').get('root_view_id')
+            for block in blocks:
+                block_id = block.get('block_id')
+                block_ids.append(block_id)
+            for block_id in block_ids[:-2]:
+                selected_value = payload_dict.get('view').get('state').get('values').get(block_id).get('plain_text_input-action').get('value')
+                selected_values.append(selected_value)
+            print(selected_values)
+            if(payload_dict.get('view').get('state').get('values').get(block_ids[4]) != None):
+                selected_values.append(payload_dict.get('view').get('state').get('values').get(block_ids[4]).get('radio_buttons-action').get('selected_option').get('text').get('text'))
+            else:
+                string_data=payload_dict.get('view').get('blocks')[4].get('text').get('text')
+                selected_values.append(string_data[-5:])
+            print(selected_values)
+            view=maintenance_utility.maintenance_utility_Schedule_all_wormly_downtime(selected_values)
+            client.views_update(token = token, view = view, view_id=view_id)
     else:
-        selected_option = payload_dict.get('actions')[0].get('selected_option').get('text').get('text')
-        blocks=maintenance_automation.selected_from_menu(selected_option,selected_menu)
-        selected_menu=selected_option
-        selected_option=selected_option.replace(' ', '_')
-        client.chat_update(token=token,channel = channel_id,ts=ts, blocks=blocks)
-        if selected_option in maintenance_utility.my_list:
-            blocks1=getattr(maintenance_utility,'maintenance_utility_%s' % selected_option)(config) 
-            client.chat_postMessage(channel = channel_id, blocks=blocks1)   
+        trigger_id = payload_dict.get('trigger_id')
+        channel_id = payload_dict.get('container').get('channel_id')
+        ts=payload_dict.get('container').get('message_ts')
+        if(payload_dict.get('actions')[0].get('type')== 'multi_static_select'):
+            selected_options=payload_dict.get('actions')[0].get('selected_options')
+            options=[]
+            for option in selected_options:
+                options.append(option.get('text').get('text'))
+            if(payload_dict.get('message').get('blocks')[0].get('accessory').get('placeholder').get('text')=='Pause IDs'):
+                blocks=maintenance_utility.do_Pause_by_ID(config,options)
+            else:
+                blocks=maintenance_utility.do_Unpause_by_ID(config,options)
+            client.chat_postMessage(channel = channel_id, blocks=blocks)
+        elif(payload_dict.get('message').get('text')== "Select a wormly host ID"):
+            selected_hostID=payload_dict.get('actions')[0].get('selected_option').get('text').get('text')
+            blocks=maintenance_utility.get_wormly_downtimes_by_hostID(selected_hostID)
+            client.chat_update(token=token,channel = channel_id,ts=ts, blocks=blocks)
+        elif(payload_dict.get('actions')[0].get('type')== 'plain_text_input'):
+            selected_value=payload_dict.get('actions')[0].get('value')
+            blocks3=maintenance_utility.maintenance_utility_Schedule_datadog_downtime(config,selected_value)
+            client.chat_update(token=token,channel = channel_id,ts=ts, blocks=blocks3)
         else:
-            blocks2=getattr(maintenance_automation, 'option_%s' % selected_option)()
-            client.chat_postMessage(channel = channel_id, blocks=blocks2)
+            selected_option = payload_dict.get('actions')[0].get('selected_option').get('text').get('text')
+            blocks=maintenance_automation.selected_from_menu(selected_option,selected_menu)
+            selected_menu=selected_option
+            selected_option=selected_option.replace(' ', '_')
+            client.chat_update(token=token,channel = channel_id,ts=ts, blocks=blocks)
+            if selected_option in maintenance_utility.my_list:
+                blocks1=getattr(maintenance_utility,'maintenance_utility_%s' % selected_option)(config) 
+                client.chat_postMessage(channel = channel_id, blocks=blocks1) 
+            elif(payload_dict.get('message').get('text')== "Select a wormly hostID"):
+                selected_hostID=payload_dict.get('actions')[0].get('selected_option').get('text').get('text')
+                results=maintenance_utility.get_default_wormly_downtimes(selected_hostID)
+                view=maintenance_automation.option_Schedule_wormly_downtime_for_hostID(results,selected_hostID)
+                client.views_open(token = token, view = view, trigger_id = trigger_id)
+            elif selected_option in maintenance_automation.my_modal_list:
+                results=maintenance_utility.get_default_wormly_downtimes()
+                view=getattr(maintenance_automation, 'option_%s' % selected_option)(results)
+                client.views_open(token = token, view = view, trigger_id = trigger_id)
+            else:
+                blocks2=getattr(maintenance_automation, 'option_%s' % selected_option)()
+                client.chat_postMessage(channel = channel_id, blocks=blocks2)
     return Response(), 200
 
     
