@@ -4,61 +4,86 @@ my_list =["Get_all","Get_by_status_Live","Get_by_status_Paused","Pause_all","Unp
 "Get_datadog_downtimes_by_status_Live","Get_datadog_downtimes_by_status_Scheduled","MyJS","CFS","Both","Get_wormly_downtimes_by_hostID","Schedule_wormly_downtime_for_hostID"] 
 
 #***********Synthetic tests start***********
+#Datadog->Synthetic tests->Get all
 def maintenance_utility_Get_all(config):
-    blocks=mtools.list_synthetic_tests(config, 'all', False)
-    return blocks
-    
+	synthetic_tests=mtools.list_synthetic_tests(config, 'all', False)
+	blocks=create_block(synthetic_tests)
+	return blocks
+
+#Datadog->Synthetic tests->Get by status->Get by status Live
 def maintenance_utility_Get_by_status_Live(config):
-	blocks=mtools.list_synthetic_tests(config, 'live', False)
+	synthetic_tests=mtools.list_synthetic_tests(config, 'live', False)
+	blocks=create_block(synthetic_tests)
 	return blocks
 
+#Datadog->Synthetic tests->Get by status->Get by status Paused
 def maintenance_utility_Get_by_status_Paused(config):
-	blocks=mtools.list_synthetic_tests(config, 'paused', False)
+	synthetic_tests=mtools.list_synthetic_tests(config, 'paused', False)
+	blocks=create_block(synthetic_tests)
 	return blocks
 
+#Datadog->Synthetic tests->Pause all
 def maintenance_utility_Pause_all(config):
-	blocks=mtools.pause_unpause_all_synthetic_tests(config, 'paused')
+	synthetic_tests_pause_unpause=mtools.pause_unpause_all_synthetic_tests(config, 'paused')
+	blocks=create_block(synthetic_tests_pause_unpause)
 	return blocks
 
+#Datadog->Synthetic tests->Unpause all
 def maintenance_utility_Unpause_all(config):
-	blocks=mtools.pause_unpause_all_synthetic_tests(config, 'live')
+	synthetic_tests_pause_unpause=mtools.pause_unpause_all_synthetic_tests(config, 'live')
+	blocks=create_block(synthetic_tests_pause_unpause)
 	return blocks
 
+#Datadog->Synthetic tests->Pause by ID
 def maintenance_utility_Pause_by_ID(config):
 	list=mtools.list_synthetic_tests(config, 'all', True)
 	options=create_options_for_multiple_select(list)
-	multiple_select_menu=create_multiple_select(options,'Pause IDs')
+	multiple_select_menu=create_multiple_select('Select synthetic test ID','Pause IDs',options)
 	return multiple_select_menu
 
+#Datadog->Synthetic tests->Unpause by ID
 def maintenance_utility_Unpause_by_ID(config):
 	list=mtools.list_synthetic_tests(config, 'all', True)
 	options=create_options_for_multiple_select(list)
-	multiple_select_menu=create_multiple_select(options,'Unpause IDs')
+	multiple_select_menu=create_multiple_select('Select synthetic test ID','Unpause IDs',options)
 	return multiple_select_menu
 
+#Datadog->Synthetic tests->Pause by ID->Multi-static-select for IDs
 def do_Pause_by_ID(config,options):
-	blocks=mtools.pause_unpause_synthetic_tests(config, options, 'paused')
+	synthetic_tests_pause_unpause=mtools.pause_unpause_synthetic_tests(config, options, 'paused')
+	blocks=create_block(synthetic_tests_pause_unpause)
 	return blocks
 
+#Datadog->Synthetic tests->Pause by ID->Multi-static-select for IDs
 def do_Unpause_by_ID(config,options):
-	blocks=mtools.pause_unpause_synthetic_tests(config, options, 'live')
+	synthetic_tests_pause_unpause=mtools.pause_unpause_synthetic_tests(config, options, 'live')
+	blocks=create_block(synthetic_tests_pause_unpause)
 	return blocks
 
 #***********Synthetic tests end***********
 
 #***********Datadog downtime start***********
+
+#Datadog->Datdog downtimes->Get all datadog downtimes
 def maintenance_utility_Get_all_datadog_downtimes(config):
-	blocks=mtools.list_downtimes(config, "all")
+	downtimes=mtools.list_downtimes(config, "all")
+	blocks=create_block(downtimes)
 	return blocks
 
+#Datadog->Datadog downtimes->Get datadog downtimes by status->Get datadog downtimes by status Live
 def maintenance_utility_Get_datadog_downtimes_by_status_Live(config):
-	blocks=mtools.list_downtimes(config, "live")
+	downtimes=mtools.list_downtimes(config, "live")
+	blocks=create_block(downtimes)
 	return blocks
 
+#Datadog->Datadog downtimes->Get datadog downtimes by status->Get datadog downtimes by status Paused
 def maintenance_utility_Get_datadog_downtimes_by_status_Scheduled(config):
-	blocks=mtools.list_downtimes(config, "scheduled")
+	downtimes=mtools.list_downtimes(config, "scheduled")
+	blocks=create_block(downtimes)
 	return blocks
 
+#Datadog->Datadog downtimes->Schedule datadog downtime
+#To-do----->make model
 def maintenance_utility_Schedule_datadog_downtime(config,selected_value):
 	start_end = selected_value.split(',')
 	print(start_end)
@@ -81,7 +106,8 @@ def maintenance_utility_Schedule_datadog_downtime(config,selected_value):
 	# Get the POSIX timestamp values
 	downtime_start = int(downtime_start_datetime.timestamp())
 	downtime_end = int(downtime_end_datetime.timestamp())
-	blocks=mtools.schedule_downtime(config, downtime_start, downtime_end)
+	downtimes=mtools.schedule_downtime(config, downtime_start, downtime_end)
+	blocks=create_block(downtimes)
 	return blocks
 #***********Downtime end***********
 
@@ -203,19 +229,19 @@ def create_modal(title,data):
 	}
 	return views
 
-def create_multiple_select(options,text):
+def create_multiple_select(text,title,options):
 	blocks= [
 		{
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "Select an option "
+				"text": text
 			},
 			"accessory":{
 				"type": "multi_static_select",
 				"placeholder": {
 					"type": "plain_text",
-					"text": text,
+					"text": title,
 					"emoji": True
 				},
 				"options":options,

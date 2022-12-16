@@ -156,17 +156,16 @@ def list_synthetic_tests(config, scope, noprint):
                 synthetic_tests+=(f"MESSAGE TO: {t['message']}" +"\n")
                 synthetic_tests+=("\n"+("*"*80)+"\n")
                 j += 1
-            blocks=maintenance_utility.create_block(synthetic_tests)
-            return blocks
         except ApiException as e:
             synthetic_tests+=("Exception when calling SyntheticsApi->list_tests: %s\n" % e)
+        return synthetic_tests
 
 
 def pause_unpause_all_synthetic_tests(config, state):
     """Pause/Unpause all Synthetic tests."""
     testIDs = list_synthetic_tests(config, all, True)
-    blocks=pause_unpause_synthetic_tests(config, testIDs, state)
-    return blocks
+    synthetic_tests_pause_unpause=pause_unpause_synthetic_tests(config, testIDs, state)
+    return synthetic_tests_pause_unpause
 
 
 def pause_unpause_synthetic_tests(config, testIDs, state):
@@ -187,9 +186,7 @@ def pause_unpause_synthetic_tests(config, testIDs, state):
                 #     api_response = api_instance.update_test_pause_status(public_id, body)
                 # except ApiException as e:
                 #     print("Exception when calling SyntheticsApi->update_test_pause_status: %s\n" % e)
-
-    blocks=maintenance_utility.create_block(synthetic_tests_pause_unpause)
-    return blocks 
+    return synthetic_tests_pause_unpause
 
 def list_downtimes(config, scope):
     """List all currently scheduled Downtimes."""
@@ -262,8 +259,7 @@ def list_downtimes(config, scope):
                 downtimes+=("********No SCHEDULED Downtimes found********")
         except ApiException as e:
             downtimes+=("Exception when calling DowntimesApi->list_downtimes: %s\n" % e)
-    blocks=maintenance_utility.create_block(downtimes)
-    return blocks 
+    return downtimes 
 
 def schedule_downtime(config, start, end):
     """Schedule Downtime."""
@@ -278,8 +274,7 @@ def schedule_downtime(config, start, end):
     #     api_instance = DowntimesApi(api_client)
     #     response = api_instance.create_downtime(body=body)
     downtimes="Downtime Scheduled"
-    blocks=maintenance_utility.create_block(downtimes)
-    return blocks
+    return downtimes
 
 def get_zabbix_url(region):
     if region == "hk":
