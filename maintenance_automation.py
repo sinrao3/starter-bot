@@ -387,13 +387,17 @@ def option_Schedule_datadog_downtime():
 			"element": {
 				"type": "plain_text_input",
 				"action_id": "plain_text_input-action",
+				"placeholder": {
+					"type": "plain_text",
+					"text": "YYYY-MM-DDTHH:MM:SS,YYYY-MM-DDTHH:MM:SS"
+    			},
 				"dispatch_action_config": {
       				"trigger_actions_on": ["on_enter_pressed"]
     			}
 			},
 			"label": {
 				"type": "plain_text",
-				"text": "Enter start and end date and time (YYYY-MM-DDTHH:MM:SS,YYYY-MM-DDTHH:MM:SS)"
+				"text": "Enter start and end date and time"
 			}
 		}
 	]

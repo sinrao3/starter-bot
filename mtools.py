@@ -86,7 +86,7 @@ def get_wormly_downtimes(hostids, noprint):
             'Accept': 'application/json',
         }
         if not noprint:
-            downtimes+=(f"Lastest Downtime for HostID: {host}")
+            downtimes+=(f"Lastest Downtime for HostID: {host}"+"\n")
         response = requests.get(url, headers=headers, data=payload)
         data = json.loads(response.text)['periods'][-1]
         results.append({host: data})

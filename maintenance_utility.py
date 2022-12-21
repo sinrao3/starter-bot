@@ -3,6 +3,12 @@ import datetime
 my_list =["Get_all","Get_by_status_Live","Get_by_status_Paused","Pause_all","Unpause_all","Pause_by_ID","Unpause_by_ID","Get_all_datadog_downtimes",
 "Get_datadog_downtimes_by_status_Live","Get_datadog_downtimes_by_status_Scheduled","MyJS","CFS","Both","Get_wormly_downtimes_by_hostID","Schedule_wormly_downtime_for_hostID"] 
 
+my_dict={
+	"Select synthetic test ID to pause" :"do_Pause_by_ID",
+	"Select synthetic test ID to unpause": "do_Unpause_by_ID",
+	"Enter start and end date and time" : "maintenance_utility_Schedule_datadog_downtime",
+	"Select a wormly host ID" : "get_wormly_downtimes_by_hostID"
+}
 #***********Synthetic tests start***********
 #Datadog->Synthetic tests->Get all
 def maintenance_utility_Get_all(config):
@@ -38,24 +44,32 @@ def maintenance_utility_Unpause_all(config):
 def maintenance_utility_Pause_by_ID(config):
 	list=mtools.list_synthetic_tests(config, 'all', True)
 	options=create_options_for_multiple_select(list)
-	multiple_select_menu=create_multiple_select('Select synthetic test ID','Pause IDs',options)
+	multiple_select_menu=create_multiple_select('Select synthetic test ID to pause','Pause IDs',options)
 	return multiple_select_menu
 
 #Datadog->Synthetic tests->Unpause by ID
 def maintenance_utility_Unpause_by_ID(config):
 	list=mtools.list_synthetic_tests(config, 'all', True)
 	options=create_options_for_multiple_select(list)
-	multiple_select_menu=create_multiple_select('Select synthetic test ID','Unpause IDs',options)
+	multiple_select_menu=create_multiple_select('Select synthetic test ID to unpause','Unpause IDs',options)
 	return multiple_select_menu
 
 #Datadog->Synthetic tests->Pause by ID->Multi-static-select for IDs
-def do_Pause_by_ID(config,options):
+def do_Pause_by_ID(config,payload_dict):
+	selected_options=payload_dict.get('actions')[0].get('selected_options')
+	options=[]
+	for option in selected_options:
+		options.append(option.get('text').get('text'))
 	synthetic_tests_pause_unpause=mtools.pause_unpause_synthetic_tests(config, options, 'paused')
 	blocks=create_block(synthetic_tests_pause_unpause)
 	return blocks
 
 #Datadog->Synthetic tests->Pause by ID->Multi-static-select for IDs
-def do_Unpause_by_ID(config,options):
+def do_Unpause_by_ID(config,payload_dict):
+	selected_options=payload_dict.get('actions')[0].get('selected_options')
+	options=[]
+	for option in selected_options:
+		options.append(option.get('text').get('text'))
 	synthetic_tests_pause_unpause=mtools.pause_unpause_synthetic_tests(config, options, 'live')
 	blocks=create_block(synthetic_tests_pause_unpause)
 	return blocks
@@ -84,9 +98,9 @@ def maintenance_utility_Get_datadog_downtimes_by_status_Scheduled(config):
 
 #Datadog->Datadog downtimes->Schedule datadog downtime
 #To-do----->make model
-def maintenance_utility_Schedule_datadog_downtime(config,selected_value):
+def maintenance_utility_Schedule_datadog_downtime(config,payload_dict):
+	selected_value=payload_dict.get('actions')[0].get('value')
 	start_end = selected_value.split(',')
-	print(start_end)
 	start_dt = start_end[0].split('T')
 	start_dp = start_dt[0].split('-')
 	start_tp = start_dt[1].split(':')
@@ -112,18 +126,22 @@ def maintenance_utility_Schedule_datadog_downtime(config,selected_value):
 #***********Downtime end***********
 
 #***********Wormly start***********
+#Wormly->Get all wormly downtimes->MyJS
 def maintenance_utility_MyJS(config):
 	blocks=mtools.get_wormly_downtimes(mtools.myjs_hostids, False)
 	return blocks
 
+#Wormly->Get all wormly downtimes->CFS
 def maintenance_utility_CFS(config):
 	blocks=mtools.get_wormly_downtimes(mtools.cfs_hostids, False)
 	return blocks
 
+#Wormly->Get all wormly downtimes->Both
 def maintenance_utility_Both(config):
 	blocks=mtools.get_wormly_downtimes(mtools.myjs_hostids+mtools.cfs_hostids, False)
 	return blocks
 
+#Wormly->Get wormly downtimes by hostID
 def maintenance_utility_Get_wormly_downtimes_by_hostID(config):
 	options=[]
 	j=0
@@ -152,12 +170,14 @@ def maintenance_utility_Get_wormly_downtimes_by_hostID(config):
 	blocks=create_static_select(options,"Select a wormly host ID")
 	return blocks
 
-def get_wormly_downtimes_by_hostID(selected_hostID):
+#Wormly->Get wormly downtimes by hostID->hostID
+def get_wormly_downtimes_by_hostID(config,payload_dict):
+	selected_hostID=payload_dict.get('actions')[0].get('selected_option').get('text').get('text')
 	blocks=mtools.get_wormly_downtimes([selected_hostID], False)
 	return blocks
 	
+#To get default values while Scheduling downtimes
 def get_default_wormly_downtimes(selected_hostID=mtools.myjs_hostids[0]):
-	print(selected_hostID)
 	result=mtools.get_wormly_downtimes([selected_hostID], True)
 	results=[]
 	results.append(result[0][selected_hostID]['on'])
@@ -166,7 +186,23 @@ def get_default_wormly_downtimes(selected_hostID=mtools.myjs_hostids[0]):
 	results.append(result[0][selected_hostID]['timezone'])
 	return results
 
-def maintenance_utility_Schedule_all_wormly_downtime(selected_values):
+#Wormly->Schedule all wormly downtimes
+def maintenance_utility_Schedule_all_wormly_downtime(payload_dict):
+	block_ids=[]
+	selected_values = []
+	blocks = payload_dict.get('view').get('blocks')
+	for block in blocks:
+		block_id = block.get('block_id')
+		block_ids.append(block_id)
+	for block_id in block_ids[:-2]:
+		selected_value = payload_dict.get('view').get('state').get('values').get(block_id).get('plain_text_input-action').get('value')
+		selected_values.append(selected_value)
+	if(payload_dict.get('view').get('state').get('values').get(block_ids[4]) != None):
+		selected_values.append(payload_dict.get('view').get('state').get('values').get(block_ids[4]).get('radio_buttons-action').get('selected_option').get('text').get('text'))
+	else:
+		string_data=payload_dict.get('view').get('blocks')[4].get('text').get('text')
+		selected_values.append(string_data[-5:])
+
 	if(selected_values[4]=="MyJS"):
 		views=mtools.set_wormly_downtimes(mtools.myjs_hostids, selected_values[1], selected_values[2], selected_values[3], "ONCEONLY",selected_values[0])
 	elif(selected_values[4]=="CFS"):
@@ -177,6 +213,7 @@ def maintenance_utility_Schedule_all_wormly_downtime(selected_values):
 		views=mtools.set_wormly_downtimes([selected_values[4]], selected_values[1], selected_values[2], selected_values[3], "ONCEONLY",selected_values[0])
 	return views
 
+#Wormly->Schedule wormly downtimes for hostID
 def maintenance_utility_Schedule_wormly_downtime_for_hostID(config):
 	options=create_options_for_multiple_select(mtools.myjs_hostids+mtools.cfs_hostids)
 	blocks=create_static_select(options,"Select a wormly hostID")
