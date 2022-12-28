@@ -38,11 +38,14 @@ def result():
     data = request.form
     payload = data.get('payload')
     payload_dict = json.loads(payload)
+    print(payload_dict)
     #views related to model updation
-    if(payload_dict.get('view') != None and (payload_dict.get('view').get('title').get('text')== "Wormly downtimes")):
+    if(payload_dict.get('view') != None and (title:=payload_dict.get('view').get('title').get('text')) in maintenance_automation.my_modal_titles):
+        print(title)
         if(payload_dict.get('type')=="block_actions"):
             view_id=payload_dict.get('view').get('root_view_id')
-            view=maintenance_utility.maintenance_utility_Schedule_all_wormly_downtime(payload_dict)
+            view=getattr(maintenance_utility, 'maintenance_utility_%s' %  maintenance_automation.my_modal_titles[title])(payload_dict)
+            #view=maintenance_utility.maintenance_utility_Schedule_all_wormly_downtime(payload_dict)
             client.views_update(token = token, view = view, view_id=view_id)
             
     #views related to blocks and opening views
@@ -68,8 +71,7 @@ def result():
                 blocks=getattr(maintenance_utility,'maintenance_utility_%s' % selected_option)(config) 
                 client.chat_postMessage(channel = channel_id, blocks=blocks) 
             elif selected_option in maintenance_automation.my_modal_list:
-                results=maintenance_utility.get_default_wormly_downtimes()
-                view=getattr(maintenance_automation, 'option_%s' % selected_option)(results)
+                view=getattr(maintenance_automation, 'option_%s' % selected_option)()
                 client.views_open(token = token, view = view, trigger_id = trigger_id)
             else:
                 blocks=getattr(maintenance_automation, 'option_%s' % selected_option)()

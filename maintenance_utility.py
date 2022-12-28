@@ -220,6 +220,89 @@ def maintenance_utility_Schedule_wormly_downtime_for_hostID(config):
 	return blocks
 
 #***********Wormly end***********
+
+#***********Zabbix start***********
+def maintenance_utility_Zabbix_maintenances(payload_dict):
+	block_ids=[]
+	selected_values = []
+	blocks = payload_dict.get('view').get('blocks')
+	for block in blocks:
+		block_id = block.get('block_id')
+		block_ids.append(block_id)
+	for block_id in block_ids[:-1]:
+		selected_value = payload_dict.get('view').get('state').get('values').get(block_id).get('plain_text_input-action').get('value')
+		selected_values.append(selected_value)
+	if(selected_values[1]=="0"):
+		title="Host ID for "+selected_values[0]
+		data="Please type in 0 for Web Server, 1 for Agent Server, 2 for Relinquish Server"
+		private_metadata=selected_values[0]+selected_values[1]
+		view=create_modal_for_single_input(title,data,private_metadata)	
+	elif(selected_values[1]=="1"):
+		title="Maint. ID for "+selected_values[0]
+		data="Please type in the maintenance id"
+		private_metadata=selected_values[0]+selected_values[1]
+		view=create_modal_for_single_input(title,data,private_metadata)
+	return view
+
+def maintenance_utility_Host_IDs(payload_dict):
+	print("Helooooooo")
+	private_metadata=payload_dict.get('view').get('private_metadata')
+	block_ids=[]
+	selected_values = []
+	selected_values.append(private_metadata[0:2])
+	selected_values.append(private_metadata[-1])
+	blocks = payload_dict.get('view').get('blocks')
+	for block in blocks:
+		block_id = block.get('block_id')
+		block_ids.append(block_id)
+	for block_id in block_ids[:-1]:
+		selected_value = payload_dict.get('view').get('state').get('values').get(block_id).get('plain_text_input-action').get('value')
+		selected_values.append(selected_value)
+	region=selected_values[0]
+	selected_server=selected_values[2]
+	zabbix_hosts = mtools.get_zabbix_hosts(region, selected_server)
+	options=create_options_for_multiple_select(zabbix_hosts)
+	private_metadata=selected_values[0]+selected_values[1]+selected_values[2]
+	view=create_modal_for_multiselect("View maint.",options,private_metadata)
+	return view
+
+def maintenance_utility_View_scheduled_maintenances(payload_dict):
+	private_metadata=payload_dict.get('view').get('private_metadata')
+	block_ids=[]
+	selected_values = []
+	selected_values.append(private_metadata[0:2])
+	selected_values.append(private_metadata[-1])
+	blocks = payload_dict.get('view').get('blocks')
+	for block in blocks:
+		block_id = block.get('block_id')
+		block_ids.append(block_id)
+	for block_id in block_ids[:-1]:
+		selected_value = payload_dict.get('view').get('state').get('values').get(block_id).get('plain_text_input-action').get('value')
+		selected_values.append(selected_value)
+		region=selected_values[0]
+		view_type = selected_values[1]
+        #view scheduled maintenances	
+		if(view_type == '0'):
+			selected_server = selected_values[2]
+			zabbix_hosts = mtools.get_zabbix_hosts(region, selected_server)
+			zabbix_hostids = list(zabbix_hosts.values())
+			zabbix_host_sel = display_zabbix_hosts_menu(zabbix_hosts)
+
+			if (zabbix_host_sel == len(zabbix_hosts)-1):
+				selected_hostid = zabbix_hostids
+			else:
+				selected_hostid = [zabbix_hostids[zabbix_host_sel]]
+
+			selected_hostid_payload = {"hostids": selected_hostid}
+			mtools.get_maintenance_details(selected_hostid_payload, False, region)
+		
+		#view maintenances for selected MAINTENANCE ID
+		elif(view_type == '1'):
+			selected_maintenance_id = selected_values[2]
+			selected_maintenance_payload = {"maintenanceids": selected_maintenance_id, "output": "extend", "selectGroups": "extend", "selectTimeperiods": "extend", "selectTags": "extend"}
+			mtools.get_maintenance_details(selected_maintenance_payload, True, region)
+
+#***********Zabbix end***********
 def create_block(data):
 	blocks= [
 		{
@@ -265,6 +348,118 @@ def create_modal(title,data):
 		]
 	}
 	return views
+
+def create_modal_for_single_input(title,data,private_metadata):
+	view={
+		"type": "modal",
+		"title": {
+			"type": "plain_text",
+			"text": title,
+			"emoji": True
+		},
+		"submit": {
+			"type": "plain_text",
+			"text": "Submit",
+			"emoji": True
+		},
+		"close": {
+			"type": "plain_text",
+			"text": "Cancel",
+			"emoji": True
+		},
+		"private_metadata":private_metadata,
+		"blocks": [
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "plain_text_input-action"
+				},
+				"label": {
+					"type": "plain_text",
+					"text": data,
+					"emoji": True
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "Click to view scheduled maintenances"
+				},
+				"accessory": {
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Click Me",
+						"emoji": True
+					},
+					"value": "click_me_123",
+					"action_id": "button-action"
+				}
+			}
+		]
+	}
+	return view
+
+def create_modal_for_multiselect(title,options,private_metadata):
+	view={
+		"type": "modal",
+		"title": {
+			"type": "plain_text",
+			"text": title,
+			"emoji": True
+		},
+		"submit": {
+			"type": "plain_text",
+			"text": "Submit",
+			"emoji": True
+		},
+		"close": {
+			"type": "plain_text",
+			"text": "Cancel",
+			"emoji": True
+		},
+		"private_metadata":private_metadata,
+		"blocks": [
+			{
+				"type": "input",
+				"element": {
+					"type": "multi_static_select",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "Select options",
+						"emoji": True
+					},
+					"options": options,
+					"action_id": "multi_static_select-action"
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "Label",
+					"emoji": True
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "Click to view scheduled maintenances"
+				},
+				"accessory": {
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Click Me",
+						"emoji": True
+					},
+					"value": "click_me_123",
+					"action_id": "button-action"
+				}
+			}
+		]
+	}
+	return view
 
 def create_multiple_select(text,title,options):
 	blocks= [

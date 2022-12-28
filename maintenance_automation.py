@@ -1,4 +1,13 @@
-my_modal_list=["Schedule_all_wormly_downtimes"]
+import maintenance_utility
+my_modal_list=["Schedule_all_wormly_downtimes", "View_scheduled_maintenances"]
+
+my_modal_titles={"Wormly downtimes":"Schedule_all_wormly_downtime",
+"Zabbix maintenances":"Zabbix_maintenances",
+"Host ID for hk":"Host_IDs",
+"Host ID for th":"Host_IDs",
+"Maint. ID for hk":"View_scheduled_maintenances",
+"Maint. ID for hk":"View_scheduled_maintenances",
+"View maint.":"View_scheduled_maintenances"}
 
 def header_blocks():
 	blocks=	[
@@ -518,7 +527,8 @@ def option_Get_all_wormly_downtimes():
 	]
 	return blocks
 	
-def option_Schedule_all_wormly_downtimes(results):
+def option_Schedule_all_wormly_downtimes():
+	results=maintenance_utility.get_default_wormly_downtimes()
 	view= {
 		"type": "modal",
 		"title": {
@@ -807,47 +817,346 @@ def option_Zabbix():
 	return blocks
 
 def option_View_scheduled_maintenances():
-	blocks = [
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "Pick a View scheduled maintenance option from the list"
-			},
-			"accessory": {
-				"type": "static_select",
-				"placeholder": {
-					"type": "plain_text",
-					"text": "Select"
+	view= {
+		"type": "modal",
+		"title": {
+			"type": "plain_text",
+			"text": "Zabbix maintenances",
+			"emoji": True
+		},
+		"submit": {
+			"type": "plain_text",
+			"text": "Submit",
+			"emoji": True
+		},
+		"close": {
+			"type": "plain_text",
+			"text": "Cancel",
+			"emoji": True
+		},
+		"blocks": [
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "plain_text_input-action"
 				},
-				"options":[
-					{
-						"text": {
-							"type": "plain_text",
-							"text": "View scheduled maintenance for hongkong"
-						},
-						"value": "0"
+				"label": {
+					"type": "plain_text",
+					"text": "Please type in hk for Hongkong and th for Thailand",
+					"emoji": True
+				}
+			},
+			{
+				"type": "input",
+				"element": {
+					"type": "plain_text_input",
+					"action_id": "plain_text_input-action"
+				},
+				"label": {
+					"type": "plain_text",
+					"text": "Please type in 0 for Host ID and 1 for Maintenance ID",
+					"emoji": True
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "Click next to continue"
+				},
+				"accessory": {
+					"type": "button",
+					"text": {
+						"type": "plain_text",
+						"text": "Click Me",
+						"emoji": True
 					},
-					{
-						"text": {
-							"type": "plain_text",
-							"text": "View scheduled maintenance for thailand"
-						},
-						"value": "1"
-					},
-					{
-						"text": {
-							"type": "plain_text",
-							"text": "Quit"
-						},
-						"value": "2"
-					}
-				],
-				"action_id": "static_select-action"
+					"value": "click_me_123",
+					"action_id": "button-action"
+				}
 			}
-		}
-	]
-	return blocks
+		]
+	}
+	return view
+# def option_View_scheduled_maintenances():
+# 	blocks = [
+# 		{
+# 			"type": "section",
+# 			"text": {
+# 				"type": "mrkdwn",
+# 				"text": "Pick a View scheduled maintenance option from the list"
+# 			},
+# 			"accessory": {
+# 				"type": "static_select",
+# 				"placeholder": {
+# 					"type": "plain_text",
+# 					"text": "Select"
+# 				},
+# 				"options":[
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "View scheduled maintenance for hongkong"
+# 						},
+# 						"value": "0"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "View scheduled maintenance for thailand"
+# 						},
+# 						"value": "1"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Quit"
+# 						},
+# 						"value": "2"
+# 					}
+# 				],
+# 				"action_id": "static_select-action"
+# 			}
+# 		}
+# 	]
+# 	return blocks
+
+# def option_View_scheduled_maintenance_for_hongkong():
+# 	blocks = [
+# 		{
+# 			"type": "section",
+# 			"text": {
+# 				"type": "mrkdwn",
+# 				"text": "Pick Host ID or Maintenance ID option from the list"
+# 			},
+# 			"accessory": {
+# 				"type": "static_select",
+# 				"placeholder": {
+# 					"type": "plain_text",
+# 					"text": "Select"
+# 				},
+# 				"options":[
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Viewing hk maintenances for a host ID"
+# 						},
+# 						"value": "0"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Viewing hk maintenance for maintenance ID"
+# 						},
+# 						"value": "1"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Quit"
+# 						},
+# 						"value": "2"
+# 					}
+# 				],
+# 				"action_id": "static_select-action"
+# 			}
+# 		}
+# 	]
+# 	return blocks
+
+# def option_View_scheduled_maintenance_for_thailand():
+# 	blocks = [
+# 		{
+# 			"type": "section",
+# 			"text": {
+# 				"type": "mrkdwn",
+# 				"text": "Pick Host ID or Maintenance ID option from the list"
+# 			},
+# 			"accessory": {
+# 				"type": "static_select",
+# 				"placeholder": {
+# 					"type": "plain_text",
+# 					"text": "Select"
+# 				},
+# 				"options":[
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Viewing th maintenance for a host ID"
+# 						},
+# 						"value": "0"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Viewing th maintenance for maintenance ID"
+# 						},
+# 						"value": "1"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Quit"
+# 						},
+# 						"value": "2"
+# 					}
+# 				],
+# 				"action_id": "static_select-action"
+# 			}
+# 		}
+# 	]
+# 	return blocks
+
+# def option_Viewing_hk_maintenances_for_a_host_ID():
+# 	blocks = [
+# 		{
+# 			"type": "section",
+# 			"text": {
+# 				"type": "mrkdwn",
+# 				"text": "Pick Server option from the list"
+# 			},
+# 			"accessory": {
+# 				"type": "static_select",
+# 				"placeholder": {
+# 					"type": "plain_text",
+# 					"text": "Select"
+# 				},
+# 				"options":[
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Web Server"
+# 						},
+# 						"value": "0"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Agent Server"
+# 						},
+# 						"value": "1"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Relinquish Server"
+# 						},
+# 						"value": "2"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Quit"
+# 						},
+# 						"value": "3"
+# 					}
+# 				],
+# 				"action_id": "static_select-action"
+# 			}
+# 		}
+# 	]
+# 	return blocks
+
+# def option_Viewing_hk_maintenances_for_maintenance_ID():
+# 	blocks = [
+# 		{
+# 			"type": "section",
+# 			"text": {
+# 				"type": "mrkdwn",
+# 				"text": "Pick Server option from the list"
+# 			},
+# 			"accessory": {
+# 				"type": "static_select",
+# 				"placeholder": {
+# 					"type": "plain_text",
+# 					"text": "Select"
+# 				},
+# 				"options":[
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Web Server"
+# 						},
+# 						"value": "0"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Agent Server"
+# 						},
+# 						"value": "1"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Relinquish Server"
+# 						},
+# 						"value": "2"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Quit"
+# 						},
+# 						"value": "3"
+# 					}
+# 				],
+# 				"action_id": "static_select-action"
+# 			}
+# 		}
+# 	]
+# 	return blocks
+
+# def option_Viewing_th_maintenances_for_a_host_ID():
+# 	blocks = [
+# 		{
+# 			"type": "section",
+# 			"text": {
+# 				"type": "mrkdwn",
+# 				"text": "Pick Server option from the list"
+# 			},
+# 			"accessory": {
+# 				"type": "static_select",
+# 				"placeholder": {
+# 					"type": "plain_text",
+# 					"text": "Select"
+# 				},
+# 				"options":[
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Web Server"
+# 						},
+# 						"value": "0"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Agent Server"
+# 						},
+# 						"value": "1"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Relinquish Server"
+# 						},
+# 						"value": "2"
+# 					},
+# 					{
+# 						"text": {
+# 							"type": "plain_text",
+# 							"text": "Quit"
+# 						},
+# 						"value": "3"
+# 					}
+# 				],
+# 				"action_id": "static_select-action"
+# 			}
+# 		}
+# 	]
+# 	return blocks
 
 def option_Schedule_zabbix_downtime():
 	blocks = [
