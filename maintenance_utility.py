@@ -43,14 +43,14 @@ def maintenance_utility_Unpause_all(config):
 #Datadog->Synthetic tests->Pause by ID
 def maintenance_utility_Pause_by_ID(config):
 	list=mtools.list_synthetic_tests(config, 'all', True)
-	options=create_options_for_multiple_select(list)
+	options=create_options_for_select(list)
 	multiple_select_menu=create_multiple_select('Select synthetic test ID to pause','Pause IDs',options)
 	return multiple_select_menu
 
 #Datadog->Synthetic tests->Unpause by ID
 def maintenance_utility_Unpause_by_ID(config):
 	list=mtools.list_synthetic_tests(config, 'all', True)
-	options=create_options_for_multiple_select(list)
+	options=create_options_for_select(list)
 	multiple_select_menu=create_multiple_select('Select synthetic test ID to unpause','Unpause IDs',options)
 	return multiple_select_menu
 
@@ -215,7 +215,7 @@ def maintenance_utility_Schedule_all_wormly_downtime(payload_dict):
 
 #Wormly->Schedule wormly downtimes for hostID
 def maintenance_utility_Schedule_wormly_downtime_for_hostID(config):
-	options=create_options_for_multiple_select(mtools.myjs_hostids+mtools.cfs_hostids)
+	options=create_options_for_select(mtools.myjs_hostids+mtools.cfs_hostids)
 	blocks=create_static_select(options,"Select a wormly hostID")
 	return blocks
 
@@ -245,7 +245,6 @@ def maintenance_utility_Zabbix_maintenances(payload_dict):
 	return view
 
 def maintenance_utility_Host_IDs(payload_dict):
-	print("Helooooooo")
 	private_metadata=payload_dict.get('view').get('private_metadata')
 	block_ids=[]
 	selected_values = []
@@ -261,47 +260,51 @@ def maintenance_utility_Host_IDs(payload_dict):
 	region=selected_values[0]
 	selected_server=selected_values[2]
 	zabbix_hosts = mtools.get_zabbix_hosts(region, selected_server)
-	options=create_options_for_multiple_select(zabbix_hosts)
+	zabbix_hosts['Select all']=''
+	options=create_options_for_select(zabbix_hosts)
 	private_metadata=selected_values[0]+selected_values[1]+selected_values[2]
-	view=create_modal_for_multiselect("View maint.",options,private_metadata)
+	view=create_modal_for_static_select("View maintenances",options,private_metadata)
 	return view
 
 def maintenance_utility_View_scheduled_maintenances(payload_dict):
+	print(payload_dict)
 	private_metadata=payload_dict.get('view').get('private_metadata')
 	block_ids=[]
 	selected_values = []
 	selected_values.append(private_metadata[0:2])
-	selected_values.append(private_metadata[-1])
-	blocks = payload_dict.get('view').get('blocks')
-	for block in blocks:
-		block_id = block.get('block_id')
-		block_ids.append(block_id)
-	for block_id in block_ids[:-1]:
-		selected_value = payload_dict.get('view').get('state').get('values').get(block_id).get('plain_text_input-action').get('value')
-		selected_values.append(selected_value)
-		region=selected_values[0]
-		view_type = selected_values[1]
+	selected_values.append(private_metadata[2])
+	region=selected_values[0]
+	view_type = selected_values[1]
+	blockid = payload_dict.get('view').get('blocks')[0].get('block_id')
         #view scheduled maintenances	
-		if(view_type == '0'):
-			selected_server = selected_values[2]
-			zabbix_hosts = mtools.get_zabbix_hosts(region, selected_server)
-			zabbix_hostids = list(zabbix_hosts.values())
-			zabbix_host_sel = display_zabbix_hosts_menu(zabbix_hosts)
+	if(view_type == '0'):
+		selected_values.append(private_metadata[-1])
+		selected_value = payload_dict.get('view').get('state').get('values').get(blockid).get('static_select-action').get('selected_option').get('value')
+		selected_values.append(selected_value)
+		selected_server = selected_values[2]
+		zabbix_hosts = mtools.get_zabbix_hosts(region, selected_server)
+		zabbix_hostids = list(zabbix_hosts.values())
+		print(zabbix_hostids)
+		print(selected_values[3])
+		if (int(selected_values[3])==len(zabbix_hostids)):
+			selected_hostid = zabbix_hostids
+		else:
+			selected_hostid = [zabbix_hostids[int(selected_values[3])]]
+		selected_hostid_payload = {"hostids": selected_hostid}
+		maintenance_string=mtools.get_maintenance_details(selected_hostid_payload, False, region)
+		view=create_modal("View maintenances",maintenance_string)
+		return view
 
-			if (zabbix_host_sel == len(zabbix_hosts)-1):
-				selected_hostid = zabbix_hostids
-			else:
-				selected_hostid = [zabbix_hostids[zabbix_host_sel]]
-
-			selected_hostid_payload = {"hostids": selected_hostid}
-			mtools.get_maintenance_details(selected_hostid_payload, False, region)
-		
 		#view maintenances for selected MAINTENANCE ID
-		elif(view_type == '1'):
-			selected_maintenance_id = selected_values[2]
-			selected_maintenance_payload = {"maintenanceids": selected_maintenance_id, "output": "extend", "selectGroups": "extend", "selectTimeperiods": "extend", "selectTags": "extend"}
-			mtools.get_maintenance_details(selected_maintenance_payload, True, region)
-
+	elif(view_type == '1'):
+		selected_value = payload_dict.get('view').get('state').get('values').get(blockid).get('plain_text_input-action').get('value')
+		selected_values.append(selected_value)
+		selected_maintenance_id = selected_values[2]
+		selected_maintenance_payload = {"maintenanceids": selected_maintenance_id, "output": "extend", "selectGroups": "extend", "selectTimeperiods": "extend", "selectTags": "extend"}
+		maintenance_string=mtools.get_maintenance_details(selected_maintenance_payload, True, region)
+		view=create_modal("View maintenances",maintenance_string)
+		return view
+		
 #***********Zabbix end***********
 def create_block(data):
 	blocks= [
@@ -359,7 +362,7 @@ def create_modal_for_single_input(title,data,private_metadata):
 		},
 		"submit": {
 			"type": "plain_text",
-			"text": "Submit",
+			"text": "Close",
 			"emoji": True
 		},
 		"close": {
@@ -385,13 +388,13 @@ def create_modal_for_single_input(title,data,private_metadata):
 				"type": "section",
 				"text": {
 					"type": "mrkdwn",
-					"text": "Click to view scheduled maintenances"
+					"text": "Click next to continue"
 				},
 				"accessory": {
 					"type": "button",
 					"text": {
 						"type": "plain_text",
-						"text": "Click Me",
+						"text": "Next",
 						"emoji": True
 					},
 					"value": "click_me_123",
@@ -402,7 +405,7 @@ def create_modal_for_single_input(title,data,private_metadata):
 	}
 	return view
 
-def create_modal_for_multiselect(title,options,private_metadata):
+def create_modal_for_static_select(title,options,private_metadata):
 	view={
 		"type": "modal",
 		"title": {
@@ -412,7 +415,7 @@ def create_modal_for_multiselect(title,options,private_metadata):
 		},
 		"submit": {
 			"type": "plain_text",
-			"text": "Submit",
+			"text": "Close",
 			"emoji": True
 		},
 		"close": {
@@ -425,18 +428,18 @@ def create_modal_for_multiselect(title,options,private_metadata):
 			{
 				"type": "input",
 				"element": {
-					"type": "multi_static_select",
+					"type": "static_select",
 					"placeholder": {
 						"type": "plain_text",
 						"text": "Select options",
 						"emoji": True
 					},
 					"options": options,
-					"action_id": "multi_static_select-action"
+					"action_id": "static_select-action"
 				},
 				"label": {
 					"type": "plain_text",
-					"text": "Label",
+					"text": "Select zabbix host",
 					"emoji": True
 				}
 			},
@@ -450,7 +453,7 @@ def create_modal_for_multiselect(title,options,private_metadata):
 					"type": "button",
 					"text": {
 						"type": "plain_text",
-						"text": "Click Me",
+						"text": "View",
 						"emoji": True
 					},
 					"value": "click_me_123",
@@ -505,7 +508,7 @@ def create_static_select(options,text):
 	]
 	return blocks
 
-def create_options_for_multiple_select(list):
+def create_options_for_select(list):
 	options=[]
 	j=0
 	for i in list:
@@ -515,7 +518,7 @@ def create_options_for_multiple_select(list):
 						"text": i,
 						"emoji": True
 					},
-					"value": "value-"+str(j)
+					"value": str(j)
 				}
 		options.append(option)
 		j+=1

@@ -348,7 +348,6 @@ def get_maintenance_details(payload, display_all, region):
     get_zabbix_auth_token(region) 
     url = get_zabbix_url(region)
     auth = ZABBIX_AUTH_TOKEN.strip('\"')
-    maintenance_mapping = {}
     r = requests.get(url,
                     json={
                         "jsonrpc": "2.0",
@@ -360,6 +359,7 @@ def get_maintenance_details(payload, display_all, region):
     maintenance_list = json.loads(json.dumps(r.json()["result"], indent=4, sort_keys=True))
     if(display_all):
         timeperiod_dict = {}
+        maintenance_string=""
         for key,value in maintenance_list[0].items():
             if(key == 'active_since' or key == 'active_till'):
                 value =  datetime.fromtimestamp(int(value), timezone)
@@ -368,14 +368,14 @@ def get_maintenance_details(payload, display_all, region):
                     if(k == 'start_date'):
                         start_date =  str(datetime.fromtimestamp(int(v), timezone))
                         value[0]['start_date'] = start_date
-            print(key,':',value,sep='')
-            
+            maintenance_string+=key +":"+str(value)+"\n"
+        return maintenance_string    
             
     else:
+        maintenance_string=""
         for index in range(len(maintenance_list)):
-            maintenance_mapping["maintenanceid"] = maintenance_list[index]['maintenanceid']
-            maintenance_mapping["name"] = maintenance_list[index]['name']
-            print(maintenance_mapping)
+            maintenance_string+="Maintenance ID: "+maintenance_list[index]['maintenanceid'] + " , Name: "+maintenance_list[index]['name']+"\n"
+        return maintenance_string
 
 def schedule_zabbix_downtime(hostid, name, active_since_posix, active_till_posix, payload, region):
     get_zabbix_auth_token(region) 

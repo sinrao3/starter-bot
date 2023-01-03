@@ -38,14 +38,11 @@ def result():
     data = request.form
     payload = data.get('payload')
     payload_dict = json.loads(payload)
-    print(payload_dict)
     #views related to model updation
     if(payload_dict.get('view') != None and (title:=payload_dict.get('view').get('title').get('text')) in maintenance_automation.my_modal_titles):
-        print(title)
         if(payload_dict.get('type')=="block_actions"):
             view_id=payload_dict.get('view').get('root_view_id')
             view=getattr(maintenance_utility, 'maintenance_utility_%s' %  maintenance_automation.my_modal_titles[title])(payload_dict)
-            #view=maintenance_utility.maintenance_utility_Schedule_all_wormly_downtime(payload_dict)
             client.views_update(token = token, view = view, view_id=view_id)
             
     #views related to blocks and opening views

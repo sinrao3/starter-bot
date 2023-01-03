@@ -6,8 +6,8 @@ my_modal_titles={"Wormly downtimes":"Schedule_all_wormly_downtime",
 "Host ID for hk":"Host_IDs",
 "Host ID for th":"Host_IDs",
 "Maint. ID for hk":"View_scheduled_maintenances",
-"Maint. ID for hk":"View_scheduled_maintenances",
-"View maint.":"View_scheduled_maintenances"}
+"Maint. ID for th":"View_scheduled_maintenances",
+"View maintenances":"View_scheduled_maintenances"}
 
 def header_blocks():
 	blocks=	[
@@ -826,7 +826,7 @@ def option_View_scheduled_maintenances():
 		},
 		"submit": {
 			"type": "plain_text",
-			"text": "Submit",
+			"text": "Close",
 			"emoji": True
 		},
 		"close": {
@@ -869,7 +869,7 @@ def option_View_scheduled_maintenances():
 					"type": "button",
 					"text": {
 						"type": "plain_text",
-						"text": "Click Me",
+						"text": "Next",
 						"emoji": True
 					},
 					"value": "click_me_123",
